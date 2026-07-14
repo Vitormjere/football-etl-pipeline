@@ -1,63 +1,31 @@
-from fpdf import FPDF, XPos, YPos
-from datetime import datetime
 from src.extract import get_standings, get_matches
 from src.transform import build_team_summaries
 from src.load import init_db, save_snapshot
+from src.report import generate_report
 
-NOMES_LIGAS = {
-    "PL": "Premier League",
-    "CL": "Champions League",
-    "PD": "La Liga"
-}
+COMPETICOES = ["PL", "CL", "PD"]
+TEMPORADA = "2025"
 
-def generate_report(dados, output_path="relatorio.pdf"):
-    pdf = FPDF()
-    pdf.add_page()
+def run_pipeline():
+    init_db()
 
-    pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, "Relatorio Semanal de Futebol", new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
+    resultado_geral = {}
 
-    pdf.set_font("Helvetica", "", 10)
-    data_geracao = datetime.now().strftime("%d/%m/%Y %H:%M")
-    pdf.cell(0, 8, f"Gerado em: {data_geracao}", new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
+    for codigo in COMPETICOES:
+        standings = get_standings(codigo, season=TEMPORADA)
+        matches = get_matches(codigo, status="FINISHED", season=TEMPORADA)
 
-    pdf.ln(5)
+        resumos = build_team_summaries(standings, matches)
 
-    for codigo, times in dados.items():
-        nome_liga = NOMES_LIGAS.get(codigo, codigo)
+        save_snapshot(codigo, resumos)
 
-        pdf.set_font("Helvetica", "B", 14)
-        pdf.cell(0, 10, nome_liga, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        pdf.ln(2)
+        resultado_geral[codigo] = resumos
 
-        pdf.set_font("Helvetica", "B", 9)
-        pdf.cell(10, 8, "Pos", border=1)
-        pdf.cell(70, 8, "Time", border=1)
-        pdf.cell(20, 8, "Pontos", border=1)
-        pdf.cell(30, 8, "Aprov.", border=1)
-        pdf.cell(40, 8, "Forma", border=1, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-
-        pdf.set_font("Helvetica", "", 9)
-        for time in times:
-            forma_texto = " ".join(time["forma"])
-
-            pdf.cell(10, 8, str(time["posicao"]), border=1)
-            pdf.cell(70, 8, time["time"], border=1)
-            pdf.cell(20, 8, str(time["pontos"]), border=1)
-            pdf.cell(30, 8, f"{time['aproveitamento']}%", border=1)
-            pdf.cell(40, 8, forma_texto, border=1, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-
-        pdf.ln(8)
-
-    pdf.output(output_path)
+    return resultado_geral
 
 if __name__ == "__main__":
-    from src.extract import get_standings, get_matches
-    from src.transform import build_team_summaries
+    dados = run_pipeline()
 
-    standings = get_standings("PL", season="2025")
-    matches = get_matches("PL", status="FINISHED", season="2025")
-    resumos = build_team_summaries(standings, matches)
+    generate_report(dados, "relatorio.pdf")
 
-    generate_report({"PL": resumos}, "relatorio.pdf")
-    print("Relatorio gerado!")
+    print("Pipeline executado, dados salvos e relatorio gerado!")

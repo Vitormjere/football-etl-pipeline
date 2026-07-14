@@ -11,10 +11,13 @@ def generate_report(dados, output_path="relatorio.pdf"):
     pdf = FPDF()
     pdf.add_page()
 
-    pdf.set_font("Helvetica", "B", 16)
+    pdf.add_font("Arial", "", "C:/Windows/Fonts/arial.ttf")
+    pdf.add_font("Arial", "B", "C:/Windows/Fonts/arialbd.ttf")
+
+    pdf.set_font("Arial", "B", 16)
     pdf.cell(0, 10, "Relatorio Semanal de Futebol", new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
 
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Arial", "", 10)
     data_geracao = datetime.now().strftime("%d/%m/%Y %H:%M")
     pdf.cell(0, 8, f"Gerado em: {data_geracao}", new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
 
@@ -23,18 +26,18 @@ def generate_report(dados, output_path="relatorio.pdf"):
     for codigo, times in dados.items():
         nome_liga = NOMES_LIGAS.get(codigo, codigo)
 
-        pdf.set_font("Helvetica", "B", 14)
+        pdf.set_font("Arial", "B", 14)
         pdf.cell(0, 10, nome_liga, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         pdf.ln(2)
 
-        pdf.set_font("Helvetica", "B", 9)
+        pdf.set_font("Arial", "B", 9)
         pdf.cell(10, 8, "Pos", border=1)
         pdf.cell(70, 8, "Time", border=1)
         pdf.cell(20, 8, "Pontos", border=1)
         pdf.cell(30, 8, "Aprov.", border=1)
         pdf.cell(40, 8, "Forma", border=1, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
 
-        pdf.set_font("Helvetica", "", 9)
+        pdf.set_font("Arial", "", 9)
         for time in times:
             forma_texto = " ".join(time["forma"])
 
