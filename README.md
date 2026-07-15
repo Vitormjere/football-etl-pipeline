@@ -63,6 +63,11 @@ Covers the transformation logic: match result calculation (win/draw/loss from a 
 ## Automation
  
 The pipeline is configured to run automatically every Sunday via Windows Task Scheduler, executing `main.py` with the project's virtual environment, no manual intervention needed to keep the historical data and report up to date.
+
+## Technical Documentation
+
+A complete technical write-up (architecture decisions, code walkthroughs, and real debugging challenges) is available here:
+[EventReservation_Documentacao.pdf](docs/Football_ETL_Pipeline_Documentacao.pdf)
  
 ## Author
  
