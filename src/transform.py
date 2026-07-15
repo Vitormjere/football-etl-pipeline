@@ -1,4 +1,3 @@
-
 from src.extract import get_matches, get_standings
 
 def get_match_result(match, team_id):
@@ -14,7 +13,7 @@ def get_match_result(match, team_id):
         return "V"
     else:
         return "D"
-    
+
 def get_team_form(matches, team_id, num_games=5):
     jogos_do_time = [
         m for m in matches
@@ -66,7 +65,7 @@ def build_team_summaries(standings_data, matches_data):
         resumos.append(resumo)
 
     return resumos
-    
+
 if __name__ == "__main__":
     standings = get_standings("PL", season="2025")
     dados_partidas = get_matches("PL", status="FINISHED", season="2025")
